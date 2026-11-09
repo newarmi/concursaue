@@ -7,6 +7,9 @@ const WEBAPP_URL = import.meta.env.VITE_GAS_URL || '';
 
 const TOKEN_KEY = 'vkuswill_admin_code';
 
+
+
+
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY) || '';
 }
