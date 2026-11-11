@@ -1,5 +1,5 @@
 import { useToast } from 'vue-toastification';
-import { onUnmounted, ref } from 'vue';
+import { onUnmounted, ref, shallowRef } from 'vue';
 import { api } from '@/api.js';
 
 const CHANNEL = 'RafflesChannel';
@@ -30,28 +30,49 @@ export const useBroadcastDashboard = () => {
   const toast = useToast();
   const channel = new BroadcastChannel(CHANNEL);
 
-  const winners = ref(null);
+  const coupons = shallowRef([]);
   const disabledDefineWinners = ref(false);
+  const deletingCouponId = shallowRef(null);
+
+  const updateCoupons = async () => {
+    try {
+      const json = await api.couponIndex({ win: 'all' });
+      coupons.value = json.data || [];
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
+  updateCoupons();
 
   const defineWinner = async () => {
     try {
       disabledDefineWinners.value = true;
       const code = await getWinner();
       channel.postMessage(creatMessages(types[1], { code }));
-      updateWiners();
+      updateCoupons();
     } catch (e) {
+      disabledDefineWinners.value = false;
       console.log(e);
       toast.error(e.message);
     }
   };
 
-  const updateWiners = () => {
-    api
-      .couponIndex()
-      .then((json) => (winners.value = json.data))
-      .catch((e) => toast.error(e.message));
+  const deleteCoupon = async (coupon) => {
+    const message = coupon.win
+      ? `Удалить выигравший купон ${coupon.code}? Он исчезнет из списка победителей.`
+      : `Удалить купон ${coupon.code}?`;
+    if (!window.confirm(message)) return;
+    deletingCouponId.value = coupon.id;
+    try {
+      await api.couponDestroy(coupon.id);
+      await updateCoupons();
+      toast.success('Купон удалён');
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      deletingCouponId.value = null;
+    }
   };
-  updateWiners();
 
   destroyBroadcast(channel);
 
@@ -94,7 +115,10 @@ export const useBroadcastDashboard = () => {
     startRiffles,
     stopRiffles,
     defineWinner,
-    winners,
+    coupons,
+    updateCoupons,
+    deleteCoupon,
+    deletingCouponId,
     disabledDefineWinners,
     reload,
   };

@@ -12,4 +12,9 @@ export default defineConfig({
     },
   },
   plugins: [vue()],
+  server: {
+    proxy: {
+      '/api': `http://127.0.0.1:${process.env.LOCAL_API_PORT || 3100}`,
+    },
+  },
 });

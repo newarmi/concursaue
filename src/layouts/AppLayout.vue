@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import NavLink from '@/components/NavLink.vue';
+import logo from '@/assets/logo.svg';
 import { hasToken, setToken } from '@/api.js';
 
 defineProps({
@@ -28,10 +29,7 @@ const logout = () => {
             <!-- Логотип + десктопное меню -->
             <div class="flex items-center min-w-0">
               <router-link :to="{ name: 'couponAdded' }" class="flex items-center gap-2 shrink-0">
-                <span class="inline-flex items-center justify-center h-8 w-8 rounded-lg text-white font-bold" style="background:#991E66">
-                  V
-                </span>
-                <span class="text-lg font-bold text-gray-900">VkusWill</span>
+                <img :src="logo" alt="Kari" class="h-8 w-auto" />
               </router-link>
 
               <nav class="hidden md:flex items-center ml-6 space-x-1">

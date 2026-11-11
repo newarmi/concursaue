@@ -5,7 +5,7 @@ import { hasToken } from '@/api.js';
 <template>
   <div class="relative min-h-screen bg-gray-100 flex items-center justify-center">
     <div class="text-center px-6">
-      <h1 class="text-4xl font-bold text-gray-900">VkusWill</h1>
+      <h1 class="text-4xl font-bold text-gray-900">Kari</h1>
       <p class="mt-3 text-gray-600">Розыгрыши и купоны</p>
       <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <router-link

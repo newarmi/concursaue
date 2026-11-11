@@ -29,5 +29,5 @@ router.beforeEach((to) => {
 });
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `${to.meta.title} — VkusWill` : 'VkusWill';
+  document.title = to.meta.title ? `${to.meta.title} — Kari` : 'Kari';
 });

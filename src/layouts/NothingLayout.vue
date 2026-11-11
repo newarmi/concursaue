@@ -8,23 +8,47 @@ const { mainFrameBlur } = defineProps({
 </script>
 
 <template>
-  <main class="bg h-full min-h-screen max-h-screen overflow-hidden w-full relative">
-    <div
-      class="HeaderBLogo__LogoImgWrp _mango"
-      :class="{ 'blur-lg': mainFrameBlur }"
-    >
-      <img :src="logo" alt="" />
+  <main class="raffle-viewport">
+    <div class="raffle-stage">
+      <div
+        class="HeaderBLogo__LogoImgWrp _mango"
+        :class="{ 'blur-lg': mainFrameBlur }"
+      >
+        <img :src="logo" alt="" />
+      </div>
+      <slot />
+      <div
+        :class="{ 'blur-lg': mainFrameBlur }"
+        class="yellow-block main-frame"
+        :style="{ backgroundImage: `url(${bg})` }"
+      ></div>
     </div>
-    <slot />
-    <div
-      :class="{ 'blur-lg': mainFrameBlur }"
-      class="yellow-block main-frame"
-      :style="{ backgroundImage: `url(${bg})` }"
-    ></div>
   </main>
 </template>
 
 <style>
+.raffle-viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #991e66;
+}
+
+.raffle-stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  max-height: 100vh;
+  overflow: hidden;
+  background: #991e66;
+  container-type: inline-size;
+}
+
 .HeaderBLogo__LogoImgWrp {
   position: absolute;
   top: 3%;

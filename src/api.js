@@ -1,16 +1,14 @@
 /**
- * API-клиент: JSONP-вызовы веб-приложения Apps Script.
+ * API-клиент веб-приложения Apps Script.
  *
- * Почему не fetch(POST): Apps Script /exec отдаёт 302-редирект на
- * script.googleusercontent.com; при POST браузер следует за ним как GET
- * (теряя тело), а сам редирект часто блокируется CORS (Issue 554057761) →
- * «Failed to fetch». JSONP (<script>) обходит CORS и корректно следует
- * редиректам, поэтому работает надёжно.
+ * Основной транспорт: POST fetch с Content-Type text/plain (простой запрос, без preflight).
+ * Fallback JSONP GET используется только для безопасных read-only действий, если POST
+ * недоступен из-за особенностей редиректов/окружения.
  */
 
 const WEBAPP_URL = import.meta.env.VITE_GAS_URL || '';
-
 const TOKEN_KEY = 'vkuswill_admin_code';
+const TIMEOUT_MS = 30000;
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY) || '';
@@ -24,6 +22,10 @@ export function setToken(code) {
 export function hasToken() {
   return !!getToken();
 }
+
+const READ_ONLY_FALLBACK = {
+  getActiveRaffle: true,
+};
 
 let seq = 0;
 
@@ -46,7 +48,7 @@ function jsonp(url) {
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error('Таймаут запроса к серверу'));
-    }, 30000);
+    }, TIMEOUT_MS);
 
     window[cb] = (data) => {
       cleanup();
@@ -55,12 +57,35 @@ function jsonp(url) {
 
     script.onerror = () => {
       cleanup();
-      reject(new Error('Не удалось связаться с сервером (CORS/сеть). Проверьте VITE_GAS_URL и доступ веб-приложения «Anyone».'));
+      reject(new Error('Не удалось связаться с сервером'));
     };
 
     script.src = src;
     document.head.appendChild(script);
   });
+}
+
+async function postJson(base, body) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(base, {
+      method: 'POST',
+      // text/plain — простой CORS-запрос (без preflight); тело — JSON.
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body),
+      redirect: 'follow',
+      signal: controller.signal,
+    });
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      throw new Error('Сервер вернул некорректный ответ');
+    }
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function call(action, payload = {}, opts = {}) {
@@ -71,13 +96,22 @@ async function call(action, payload = {}, opts = {}) {
   if (opts.admin) body.token = opts.token || getToken();
 
   const base = WEBAPP_URL.replace(/[?#].*$/, '');
-  // передаём тело целиком в data (JSON) — надёжно для вложенных структур
-  const url = `${base}?action=${encodeURIComponent(action)}&data=${encodeURIComponent(JSON.stringify(body))}`;
-  if (url.length > 7500) {
-    throw new Error('Слишком большой запрос. Уменьшите объём данных или разбейте на части.');
+
+  let json;
+  try {
+    json = await postJson(base, body);
+  } catch (e) {
+    if (!READ_ONLY_FALLBACK[action]) {
+      const msg = e && e.name === 'AbortError'
+        ? 'Таймаут запроса к серверу'
+        : 'Не удалось выполнить запрос. Проверьте подключение и развёртывание Apps Script.';
+      throw new Error(msg);
+    }
+    // Fallback: JSONP GET без передачи токена.
+    const url = `${base}?action=${encodeURIComponent(action)}`;
+    json = await jsonp(url);
   }
 
-  const json = await jsonp(url);
   if (!json || json.ok === false) {
     throw new Error((json && json.error) || 'Ошибка сервера');
   }
@@ -90,7 +124,8 @@ export const api = {
   leadStore: (p) => call('leadStore', p),
   couponStore: (p) => call('couponStore', p),
 
-  couponIndex: () => call('couponIndex', {}, { admin: true }),
+  couponIndex: (p = {}) => call('couponIndex', p, { admin: true }),
+  couponDestroy: (id) => call('couponDestroy', { id }, { admin: true }),
   couponDefineWinner: () => call('couponDefineWinner', {}, { admin: true }),
 
   raffleConfig: () => call('raffleConfig', {}, { admin: true }),

@@ -56,9 +56,11 @@ const submit = async () => {
               v-model.trim="form.code"
               id="code"
               required
+              maxlength="9"
               :class="classes.coupon.input"
               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
+            <p class="mt-1 text-sm text-gray-500">Не более 9 символов</p>
           </div>
           <div class="text-red-600" v-show="classes.coupon.text">{{ classes.coupon.text }}</div>
         </div>

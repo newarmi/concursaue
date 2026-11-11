@@ -6,11 +6,13 @@ Google Apps Script (живёт в репозитории `vkuswill`, папка 
 ## Локальный запуск
 
 ```bash
-cp .env.example .env   # впиши VITE_GAS_URL (URL веб-приложения Apps Script …/exec)
-npm install
-npm run dev            # http://localhost:5173
-npm run build          # сборка в dist/
+cd ..
+npm run dev            # локальный API + фронтенд, http://127.0.0.1:5173/
 ```
+
+В режиме разработки `VITE_GAS_URL=/api`, Vite направляет запросы на локальный
+API (`127.0.0.1:3100`). Данные и код администратора описаны в корневом README.
+Для production-сборки по-прежнему нужен `VITE_GAS_URL` с URL Apps Script `/exec`.
 
 ## Развёртывание (GitHub Pages)
 
@@ -42,3 +44,6 @@ src/
   на `#/admin`), проверяется на стороне Apps Script.
 - Анимация розыгрыша (`#/raffle`) управляется с панели (`#/raffleAdmin`) через
   `BroadcastChannel` — серверного push нет.
+- Область купона на экране 16:9 задаётся в панели розыгрыша: размер и отступы
+  в процентах. Настройка сохраняется в браузере и применяется к другим вкладкам
+  того же сайта через `localStorage`.

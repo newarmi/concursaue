@@ -5,8 +5,10 @@ import CardComponent from '@/components/CardComponent.vue';
 import card1 from '@/assets/card1.svg';
 import { useAnimation } from '@/composables/animation.js';
 import { useBroadcastRaffle } from '@/composables/broadcast.js';
+import { useCouponDisplay } from '@/composables/couponDisplay.js';
 
 const { arr, start, close, animState, showWinner } = useAnimation();
+const { winnerStyle } = useCouponDisplay();
 
 useBroadcastRaffle(start, showWinner, close);
 </script>
@@ -14,7 +16,7 @@ useBroadcastRaffle(start, showWinner, close);
 <template>
   <nothing-layout :main-frame-blur="animState.mainFrameBlur">
     <div
-      class="main-frame h-full min-h-screen w-full flex items-center justify-center overflow-hidden"
+      class="main-frame h-full w-full flex items-center justify-center overflow-hidden"
       :class="{ 'blur-lg': animState.mainFrameBlur }"
     >
       <TransitionGroup appear name="list" tag="ul">
@@ -24,9 +26,9 @@ useBroadcastRaffle(start, showWinner, close);
       </TransitionGroup>
     </div>
     <transition name="fade">
-      <div v-show="animState.winner" class="winner">
+      <div v-show="animState.winner" class="winner" :style="winnerStyle">
         <img class="winner__bg" :src="card1" alt="" />
-        <div class="winner__code">KAriRafle76887</div>
+        <div class="winner__code">123456789</div>
       </div>
     </transition>
   </nothing-layout>
