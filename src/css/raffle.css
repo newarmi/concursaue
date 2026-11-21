@@ -94,13 +94,18 @@
     position: absolute;
 
     left: 50%;
-    top: 70%;
+    top: 65%;
     transform: translateX(-50%);
 
     color: #a80b7a;
 
+    max-width: 94%;
     font-weight: 900;
-    font-size: min(5.2cqw, 100px);
+    font-size: min(9.5cqw, 180px);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-align: center;
     white-space: nowrap;
 
 }
