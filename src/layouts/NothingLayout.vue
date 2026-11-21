@@ -1,6 +1,5 @@
 <script setup>
 import logo from '@/assets/logo.svg';
-import bg from '@/assets/bg.svg';
 
 const { mainFrameBlur } = defineProps({
   mainFrameBlur: Boolean,
@@ -17,17 +16,37 @@ const { mainFrameBlur } = defineProps({
         <img :src="logo" alt="" />
       </div>
       <slot />
-      <div
-        :class="{ 'blur-lg': mainFrameBlur }"
-        class="yellow-block main-frame"
-        :style="{ backgroundImage: `url(${bg})` }"
-      ></div>
+    </div>
+    <!-- Белый «пол» экрана розыгрыша: живёт на уровне вьюпорта (примыкает
+         к краям экрана на любых соотношениях сторон — сцена внутри 16:9
+         летербоксится), размер — в контейнерных единицах. Инлайн-SVG с
+         preserveAspectRatio="none" тянется ровно по блоку без кропа.
+         Полупрозрачная волна над полом — мягкий «отблеск». -->
+    <div :class="{ 'blur-lg': mainFrameBlur }" class="floor main-frame">
+      <svg
+        class="floor__svg"
+        viewBox="0 0 1920 360"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M0 232 C 520 204, 1000 84, 1500 36 C 1700 18, 1840 26, 1920 60 L1920 360 H0 Z"
+          fill="#fff"
+          opacity="0.16"
+        />
+        <path
+          d="M0 272 C 520 244, 1000 120, 1500 68 C 1720 46, 1850 56, 1920 92 L1920 360 H0 Z"
+          fill="#fff"
+        />
+      </svg>
     </div>
   </main>
 </template>
 
 <style>
 .raffle-viewport {
+  position: relative;
+  container: raffle-viewport / size;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,20 +59,20 @@ const { mainFrameBlur } = defineProps({
 
 .raffle-stage {
   position: relative;
-  width: min(100vw, calc(100vh * 16 / 9));
-  width: min(100vw, calc(100dvh * 16 / 9));
-  aspect-ratio: 16 / 9;
-  max-height: 100vh;
+  /* сцена занимает весь экран: карточки и победитель должны заполнять
+     его целиком на любом соотношении сторон, без летербокса */
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: #991e66;
-  container-type: inline-size;
+  container-type: size;
 }
 
 .HeaderBLogo__LogoImgWrp {
   position: absolute;
-  top: 3%;
-  left: 20px;
-  width: 15%;
+  top: 2.5cqw;
+  left: 2.5cqw;
+  width: 14cqw;
 }
 
 .main-frame {
@@ -65,13 +84,19 @@ body {
   background: #991e66;
 }
 
-.yellow-block {
+/* Белый «пол» экрана розыгрыша */
+.floor {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20%;
-  background-repeat: no-repeat;
-  background-size: cover;
+  height: 22cqh; /* от контейнера raffle-viewport */
+  pointer-events: none;
+}
+
+.floor__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 </style>

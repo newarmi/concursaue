@@ -1,5 +1,5 @@
 <script setup>
-import card from '@/assets/card1.svg';
+import card from '@/assets/winner-card.svg';
 import { useCouponDisplay } from '@/composables/couponDisplay.js';
 
 const { settings, winnerStyle, updateSetting, resetSettings, minInset, maxSize, maxOffset } = useCouponDisplay();
@@ -82,13 +82,14 @@ const { settings, winnerStyle, updateSetting, resetSettings, minInset, maxSize, 
   aspect-ratio: 16 / 9;
   container-type: inline-size;
   overflow: hidden;
-  border-radius: 2%;
+  background: #fff;
+  border-radius: 2.5%;
 }
 
 .coupon-settings__coupon img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: fill;
 }
 
 .coupon-settings__coupon span {

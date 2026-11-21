@@ -5,6 +5,7 @@ const FILLING_COUNT = 50;
 const FILLING_TIME = 50;
 const SHUFFLE_DURATION = 400; // должно совпадать с CSS transition на transform
 const SHUFFLE_PADDING = 20; // запас, чтобы не наслаивались шаги
+const WINNER_SHOW_TIME = 10000; // купон победителя держится на экране и уходит сам
 
 export const useAnimation = () => {
   const arr = reactive([]);
@@ -18,6 +19,7 @@ export const useAnimation = () => {
 
   let intervalIdShuffle = null;
   let shufflingBusy = false; // защита от наложений
+  let winnerHideTimer = null; // таймер авто-скрытия купона победителя
 
   // Равномерный и быстрый Fisher–Yates
   const shuffleCopy = (a) => {
@@ -89,10 +91,18 @@ export const useAnimation = () => {
   const showWinner = async (code) => {
     if (animState.winner) {
       animState.winner = false;
+      clearTimeout(winnerHideTimer);
       await setTimoutAsync(() => {}, 900);
     }
     animState.code = code;
     animState.winner = true;
+
+    // через 10 секунд купон уходит сам; если объявили нового победителя —
+    // таймер перезапускается на новый купон
+    clearTimeout(winnerHideTimer);
+    winnerHideTimer = setTimeout(() => {
+      animState.winner = false;
+    }, WINNER_SHOW_TIME);
     return 0;
   };
 

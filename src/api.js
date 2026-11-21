@@ -7,16 +7,30 @@
  */
 
 const WEBAPP_URL = import.meta.env.VITE_GAS_URL || '';
-const TOKEN_KEY = 'vkuswill_admin_code';
+const TOKEN_KEY = 'vkuswill_admin_session';
+const EXPIRY_KEY = 'vkuswill_admin_session_expires_at';
 const TIMEOUT_MS = 30000;
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || '';
+  const token = localStorage.getItem(TOKEN_KEY) || '';
+  if (!token) return '';
+  // сессия без метки истечения (или протухшая) недействительна — нужен повторный вход
+  const expiresAt = Number(localStorage.getItem(EXPIRY_KEY)) || 0;
+  if (!expiresAt || Date.now() >= expiresAt) {
+    setToken('');
+    return '';
+  }
+  return token;
 }
 
-export function setToken(code) {
-  if (code) localStorage.setItem(TOKEN_KEY, code);
-  else localStorage.removeItem(TOKEN_KEY);
+export function setToken(token, expiresAt = 0) {
+  if (token && expiresAt) {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(EXPIRY_KEY, String(expiresAt));
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(EXPIRY_KEY);
+  }
 }
 
 export function hasToken() {
@@ -119,7 +133,7 @@ async function call(action, payload = {}, opts = {}) {
 }
 
 export const api = {
-  verify: (token) => call('verify', {}, { admin: true, token }),
+  adminLogin: (code) => call('adminLogin', { code }),
   getActiveRaffle: () => call('getActiveRaffle'),
   leadStore: (p) => call('leadStore', p),
   couponStore: (p) => call('couponStore', p),

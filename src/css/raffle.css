@@ -35,46 +35,48 @@
     line-height: 57px; /* 100% */
 }
 
+/* Сетка карточек: 10 колонок × 5 рядов ровно заполняют экран.
+   Отступы — безопасные зоны: сверху логотип (cqw), снизу белый «пол» (cqh).
+   Зазоры — через gap, поэтому ширина/высота ячейки считается вместе с ними */
 .raffle-stage ul {
+    --card-gap: min(14px, 0.8cqw);
+
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
-    align-content: flex-start;
+    align-items: stretch;
+    align-content: stretch;
     position: relative;
-
-    margin-top: 5%;
 
     z-index: 2;
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 8cqw 1cqw 23cqh;
+    gap: var(--card-gap);
 }
 
 .raffle-stage li {
-    height: 6.5cqw;
-    width: 10%;
-    padding: min(20px, 1cqw);
-
+    /* скругление запечено в самом card1.svg (rx у белого rect) — CSS-обрезка
+       (border-radius / clip-path) в этом webview слетает у летящих карт */
+    width: calc((100% - 9 * var(--card-gap)) / 10);
+    height: calc((100% - 4 * var(--card-gap)) / 5);
 }
 
-.HeaderBLogo__LogoImgWrp {
-    position: absolute;
-    top: 3%;
-    left: 20px;
-    width: 20%;
-}
+/* Размер карты внутри li — в CardComponent.vue (scoped) */
 
-.HeaderBLogo__LogoImgWrpP svg {
-    width: 100%;
-    height: auto;
-}
+/* Стили логотипа — в NothingLayout.vue (единый источник, cqw-единицы) */
 
+/* Купон победителя: белый блок со скруглением (CSS-клип на самом блоке —
+   внутри квадратный winner-card.svg, поэтому фон не просвечивает в углах).
+   Радиус в cqw — пропорционален экрану. Во время fade-ухода клип ненадолго
+   роняется композитором — это ок, купон в этот момент растворяется */
 .winner {
     position: absolute;
     aspect-ratio: 16 / 9;
     z-index: 100;
     overflow: hidden;
-    box-shadow: 0 4px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 2%;
+    background: #fff;
+    border-radius: 2.5cqw;
     container-type: inline-size;
 }
 
@@ -107,12 +109,12 @@
     animation: bounce-in .4s !important;
 }
 
+/* Перемешивание: карты плавно перелетают на новые места (FLIP от Vue).
+   Длительность совпадает с SHUFFLE_DURATION в animation.js */
 .list-move,
 .list-enter-active,
 .list-leave-active {
-    transition: transform .4s ease, opacity .2s ease;
-    will-change: transform, opacity;
-    transform: translateZ(0);
+    transition: transform .4s cubic-bezier(.45, .05, .35, 1), opacity .2s ease;
 }
 
 .list-enter-from,

@@ -2,7 +2,7 @@
 import '~/css/raffle.css';
 import NothingLayout from '@/layouts/NothingLayout.vue';
 import CardComponent from '@/components/CardComponent.vue';
-import card1 from '@/assets/card1.svg';
+import winnerCard from '@/assets/winner-card.svg';
 import { useAnimation } from '@/composables/animation.js';
 import { useBroadcastRaffle } from '@/composables/broadcast.js';
 import { useCouponDisplay } from '@/composables/couponDisplay.js';
@@ -27,7 +27,7 @@ useBroadcastRaffle(start, showWinner, close);
     </div>
     <transition name="fade">
       <div v-show="animState.winner" class="winner" :style="winnerStyle">
-        <img class="winner__bg" :src="card1" alt="" />
+        <img class="winner__bg" :src="winnerCard" alt="" />
         <div class="winner__code">{{ animState.code }}</div>
       </div>
     </transition>

@@ -14,8 +14,8 @@ const submit = async () => {
   submitting.value = true;
   error.value = null;
   try {
-    await api.verify(code.value);
-    setToken(code.value);
+    const session = await api.adminLogin(code.value);
+    setToken(session.token, session.expiresAt);
     const redirect = route.query.redirect;
     router.push(redirect || { name: 'raffleAdmin' });
   } catch (e) {

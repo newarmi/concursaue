@@ -23,7 +23,7 @@ const logout = () => {
 <template>
   <div>
     <div class="min-h-screen bg-gray-100">
-      <nav class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <nav class="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between h-16">
             <!-- Логотип + десктопное меню -->
@@ -63,32 +63,40 @@ const logout = () => {
               </router-link>
             </div>
 
-            <!-- Гамбургер -->
-            <div class="md:hidden">
-              <button
-                type="button"
-                class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none"
-                @click="open = !open"
-              >
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                  <path
-                    v-if="!open"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                  <path
-                    v-else
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
           </div>
+        </div>
+      </nav>
+
+      <!-- Page Heading -->
+      <header v-if="$slots.header" class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          <slot name="header" />
+
+          <!-- Гамбургер -->
+          <button
+            type="button"
+            class="md:hidden inline-flex shrink-0 items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none"
+            :aria-expanded="open"
+            aria-label="Открыть меню"
+            @click="open = !open"
+          >
+            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+              <path
+                v-if="!open"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+              <path
+                v-else
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
         <!-- Мобильное меню -->
@@ -119,13 +127,6 @@ const logout = () => {
               Вход
             </router-link>
           </div>
-        </div>
-      </nav>
-
-      <!-- Page Heading -->
-      <header v-if="$slots.header" class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <slot name="header" />
         </div>
       </header>
 
